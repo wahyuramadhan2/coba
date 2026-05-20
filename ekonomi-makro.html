@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Ekonomi Makro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .chart-container h2 {
+            margin-bottom: 5px;
+            color: #4facfe;
+        }
+        .chart-container p {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        canvas {
+            max-height: 350px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .formula-box {
+            background: rgba(79, 172, 254, 0.1);
+            border-left: 4px solid #4facfe;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 900px;
+            border-radius: 0 8px 8px 0;
+        }
+        .formula-box h3 {
+            color: #4facfe;
+            margin-bottom: 8px;
+        }
+        .formula-box code {
+            color: #00f2fe;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ekonomi Makro</h1>
+    <p class="subtitle">Visualisasi Indikator-Indikator Ekonomi Makro</p>
+
+    <div class="formula-box">
+        <h3>Rumus PDB (Pendekatan Pengeluaran)</h3>
+        <code>GDP = C + I + G + (X - M)</code>
+        <p style="color:#aaa; margin-top:8px;">C = Konsumsi, I = Investasi, G = Belanja Pemerintah, X = Ekspor, M = Impor</p>
+    </div>
+
+    <!-- Grafik 1: Pertumbuhan PDB -->
+    <div class="chart-container">
+        <h2>1. Pertumbuhan PDB Indonesia (%)</h2>
+        <p>Pertumbuhan ekonomi tahunan Indonesia dari 2015 hingga 2024</p>
+        <canvas id="gdpChart"></canvas>
+    </div>
+
+    <!-- Grafik 2: Inflasi -->
+    <div class="chart-container">
+        <h2>2. Tingkat Inflasi (%)</h2>
+        <p>Perbandingan inflasi beberapa negara (rata-rata tahunan)</p>
+        <canvas id="inflationChart"></canvas>
+    </div>
+
+    <div class="grid">
+        <!-- Grafik 3: Komponen PDB -->
+        <div class="chart-container">
+            <h2>3. Komponen PDB</h2>
+            <p>Distribusi komponen PDB Indonesia</p>
+            <canvas id="gdpComponentChart"></canvas>
+        </div>
+
+        <!-- Grafik 4: Pengangguran -->
+        <div class="chart-container">
+            <h2>4. Tingkat Pengangguran (%)</h2>
+            <p>Perbandingan pengangguran beberapa negara</p>
+            <canvas id="unemploymentChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Grafik 5: Siklus Bisnis -->
+    <div class="chart-container">
+        <h2>5. Siklus Bisnis (Business Cycle)</h2>
+        <p>Ilustrasi pergerakan ekonomi melalui fase ekspansi dan kontraksi</p>
+        <canvas id="businessCycleChart"></canvas>
+    </div>
+
+    <!-- Grafik 6: Kebijakan Moneter -->
+    <div class="chart-container">
+        <h2>6. Suku Bunga Acuan Bank Sentral (%)</h2>
+        <p>Perbandingan suku bunga acuan beberapa bank sentral dunia</p>
+        <canvas id="interestRateChart"></canvas>
+    </div>
+
+    <!-- Grafik 7: Supply & Demand Agregat -->
+    <div class="chart-container">
+        <h2>7. Kurva Penawaran & Permintaan Agregat (AD-AS)</h2>
+        <p>Model dasar keseimbangan ekonomi makro</p>
+        <canvas id="adAsChart"></canvas>
+    </div>
+
+    <script>
+        // 1. Pertumbuhan PDB Indonesia
+        new Chart(document.getElementById('gdpChart'), {
+            type: 'line',
+            data: {
+                labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [{
+                    label: 'Pertumbuhan PDB (%)',
+                    data: [4.88, 5.03, 5.07, 5.17, 5.02, -2.07, 3.69, 5.31, 5.05, 5.05],
+                    borderColor: '#4facfe',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#4facfe',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                },
+                scales: {
+                    x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
+        // 2. Inflasi
+        new Chart(document.getElementById('inflationChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Indonesia', 'Malaysia', 'Thailand', 'Filipina', 'Vietnam', 'Singapura'],
+                datasets: [{
+                    label: 'Inflasi 2024 (%)',
+                    data: [2.3, 1.8, 0.4, 3.2, 3.6, 2.4],
+                    backgroundColor: [
+                        'rgba(79, 172, 254, 0.7)',
+                        'rgba(0, 242, 254, 0.7)',
+                        'rgba(102, 126, 234, 0.7)',
+                        'rgba(118, 75, 162, 0.7)',
+                        'rgba(255, 107, 107, 0.7)',
+                        'rgba(78, 205, 196, 0.7)'
+                    ],
+                    borderColor: [
+                        '#4facfe',
+                        '#00f2fe',
+                        '#667eea',
+                        '#764ba2',
+                        '#ff6b6b',
+                        '#4ecdc4'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                },
+                scales: {
+                    x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
+        // 3. Komponen PDB
+        new Chart(document.getElementById('gdpComponentChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Konsumsi (C)', 'Investasi (I)', 'Belanja Pemerintah (G)', 'Ekspor Neto (X-M)'],
+                datasets: [{
+                    data: [57, 32, 8, 3],
+                    backgroundColor: [
+                        'rgba(79, 172, 254, 0.8)',
+                        'rgba(0, 242, 254, 0.8)',
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(78, 205, 196, 0.8)'
+                    ],
+                    borderColor: '#1a1a2e',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#fff', padding: 15 }
+                    }
+                }
+            }
+        });
+
+        // 4. Pengangguran
+        new Chart(document.getElementById('unemploymentChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Indonesia', 'Malaysia', 'Jepang', 'AS', 'India', 'Jerman'],
+                datasets: [{
+                    label: 'Tingkat Pengangguran (%)',
+                    data: [5.3, 3.3, 2.5, 4.1, 7.1, 5.9],
+                    backgroundColor: 'rgba(255, 107, 107, 0.7)',
+                    borderColor: '#ff6b6b',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                },
+                scales: {
+                    x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
+        // 5. Siklus Bisnis
+        const cycleLabels = [];
+        const cycleData = [];
+        for (let i = 0; i <= 360; i += 10) {
+            cycleLabels.push('');
+            cycleData.push(Math.sin(i * Math.PI / 180) * 3 + 3);
+        }
+        new Chart(document.getElementById('businessCycleChart'), {
+            type: 'line',
+            data: {
+                labels: cycleLabels,
+                datasets: [{
+                    label: 'Output Ekonomi',
+                    data: cycleData,
+                    borderColor: '#00f2fe',
+                    backgroundColor: 'rgba(0, 242, 254, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }, {
+                    label: 'Trend Jangka Panjang',
+                    data: Array(cycleLabels.length).fill(3),
+                    borderColor: 'rgba(255,255,255,0.3)',
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } },
+                    annotation: {}
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        ticks: { display: false },
+                        grid: { color: 'rgba(255,255,255,0.02)' },
+                        title: { display: true, text: 'Waktu →', color: '#aaa' }
+                    },
+                    y: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: { display: true, text: 'Output (PDB Riil)', color: '#aaa' }
+                    }
+                }
+            }
+        });
+
+        // 6. Suku Bunga
+        new Chart(document.getElementById('interestRateChart'), {
+            type: 'line',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [{
+                    label: 'Bank Indonesia',
+                    data: [5.0, 3.75, 3.5, 5.5, 6.0, 6.25],
+                    borderColor: '#4facfe',
+                    tension: 0.3,
+                    pointRadius: 4
+                }, {
+                    label: 'The Fed (AS)',
+                    data: [1.75, 0.25, 0.25, 4.5, 5.5, 5.0],
+                    borderColor: '#ff6b6b',
+                    tension: 0.3,
+                    pointRadius: 4
+                }, {
+                    label: 'ECB (Eropa)',
+                    data: [0.0, 0.0, 0.0, 2.5, 4.5, 3.75],
+                    borderColor: '#78e08f',
+                    tension: 0.3,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                },
+                scales: {
+                    x: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: { display: true, text: 'Suku Bunga (%)', color: '#aaa' }
+                    }
+                }
+            }
+        });
+
+        // 7. AD-AS Curve
+        const adAsLabels = ['', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', ''];
+        const adData = [9, 8.2, 7.5, 6.8, 6.2, 5.5, 4.9, 4.3, 3.7, 3.2, 2.7, 2.2];
+        const asData = [2, 2.3, 2.7, 3.2, 3.8, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5];
+        new Chart(document.getElementById('adAsChart'), {
+            type: 'line',
+            data: {
+                labels: adAsLabels,
+                datasets: [{
+                    label: 'Permintaan Agregat (AD)',
+                    data: adData,
+                    borderColor: '#4facfe',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    fill: false
+                }, {
+                    label: 'Penawaran Agregat (AS)',
+                    data: asData,
+                    borderColor: '#ff6b6b',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: { display: true, text: 'Output Riil (Y)', color: '#aaa' }
+                    },
+                    y: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        title: { display: true, text: 'Tingkat Harga (P)', color: '#aaa' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
